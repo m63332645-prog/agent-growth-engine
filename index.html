@@ -1,0 +1,158 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保险营销员成长引擎</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #F4F6F8; color: #282B3E; -webkit-font-smoothing: antialiased; }
+        
+        /* Liquid Glass Core Utilities */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        
+        .glass-tab {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .liquid-gradient-green {
+            background: linear-gradient(135deg, #00A758 0%, #00C46E 50%, #5CD790 100%);
+            box-shadow: 0 10px 30px -5px rgba(0, 167, 88, 0.3);
+        }
+
+        .liquid-gradient-white {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+        }
+
+        .squircle { border-radius: 2.5rem; }
+        .squircle-lg { border-radius: 3.5rem; }
+        .squircle-sm { border-radius: 1.5rem; }
+
+        .ios-shadow {
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05), 0 10px 20px -5px rgba(0, 0, 0, 0.02);
+        }
+
+        .tab-active { color: #00A758; position: relative; }
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: #00A758;
+            border-radius: 50%;
+        }
+
+        /* Smoothing scrollbars for a cleaner look */
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        
+        /* Smooth transitions for glass interactions */
+        .glass-interaction { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .glass-interaction:active { transform: scale(0.96); opacity: 0.8; }
+
+        /* 团队人员看板 - 去除颜色与极简化设计 */
+        #team-members-dashboard {
+            background-color: #ffffff !important;
+            border-color: #f1f5f9 !important;
+        }
+        #team-members-dashboard h3 {
+            color: #0f172a !important;
+        }
+        #team-members-dashboard h3 span {
+            background-color: #475569 !important; /* Change brand green bar to dark slate bar */
+        }
+        #team-members-dashboard div.divide-y > div {
+            border-bottom-color: #f1f5f9 !important;
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+        }
+        /* Member name & role badge */
+        #team-members-dashboard p.font-bold {
+            color: #1e293b !important;
+            font-size: 13px !important;
+        }
+        #team-members-dashboard span.text-\[-xs\], 
+        #team-members-dashboard span.text-\[8\.5px\] {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            border: 1px solid #e2e8f0 !important;
+            font-weight: 600 !important;
+        }
+        /* Metric badges (e.g. 建档, POP, etc.) */
+        #team-members-dashboard span.inline-flex,
+        #team-members-dashboard [class*="inline-flex"] {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            border: 1px solid #ebd5e1 !important; /* overridden to ultra clean light grey below */
+            border-color: #e2e8f0 !important;
+            font-size: 10px !important;
+            padding: 2px 6px !important;
+            border-radius: 4px !important;
+            box-shadow: none !important;
+        }
+        #team-members-dashboard span.inline-flex b,
+        #team-members-dashboard [class*="inline-flex"] b {
+            color: #0f172a !important;
+            font-weight: 800 !important;
+        }
+        /* Right alignment columns */
+        #team-members-dashboard p.font-extrabold.text-\[\#00A758\],
+        #team-members-dashboard p.font-extrabold {
+            color: #0f172a !important; /* removes the green color from numbers like +4人已入司 */
+            font-size: 13px !important;
+            font-weight: 700 !important;
+        }
+        /* Role / status tags (like 领头先锋) */
+        #team-members-dashboard span.bg-green-50,
+        #team-members-dashboard span.text-\[\#00A758\] {
+            background-color: #f1f5f9 !important;
+            color: #475569 !important;
+            border: 1px solid #e2e8f0 !important;
+            font-size: 8px !important;
+            padding: 1px 4px !important;
+            font-weight: 700 !important;
+            border-radius: 3px !important;
+        }
+        /* Flow mode (建档➔POP) transition badges */
+        #team-members-dashboard div[class*="text-slate-500"] span {
+            background-color: #f8fafc !important;
+            color: #64748b !important;
+            border-color: #e2e8f0 !important;
+        }
+        #team-members-dashboard div[class*="text-slate-500"] span b {
+            color: #0c111d !important;
+        }
+    </style>
+<script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.40.0"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+<script type="module" src="/index.tsx"></script>
+</body>
+</html>
