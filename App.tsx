@@ -1925,6 +1925,16 @@ const BasicLawModal: React.FC<{
       }
     >
       <div className="flex-1 flex flex-col font-sans bg-[#f4faf7] min-h-full pb-20">
+        {/* Red Notice Banner: Page is for reference only */}
+        <div className="px-4 pt-2 pb-1 shrink-0">
+          <div className="flex items-start gap-2 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 text-rose-600">
+            <i className="fa-solid fa-circle-exclamation text-sm mt-0.5 shrink-0"></i>
+            <p className="text-xs font-bold leading-relaxed">
+              当前页面仅作跳转参考，页面实际样式与字段以现有2.0页面为准
+            </p>
+          </div>
+        </div>
+
         {/* Banner with Month Info and warning */}
         <div className="px-5 py-4 bg-gradient-to-b from-white/90 to-transparent flex flex-col gap-2.5 select-none">
           {/* Month & Year Selection Row */}

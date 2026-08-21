@@ -170,6 +170,16 @@ export const PromotionManagementModal: React.FC<PromotionManagementModalProps> =
         </div>
       </div>
 
+      {/* Red Notice Banner: Page is for reference only */}
+      <div className="px-4 pt-2 pb-1 shrink-0 z-20">
+        <div className="flex items-start gap-2 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2 text-rose-600">
+          <i className="fa-solid fa-circle-exclamation text-sm mt-0.5 shrink-0"></i>
+          <p className="text-xs font-bold leading-relaxed">
+            当前页面仅供作跳转参考，页面实际样式与字段以现有2.0页面为准
+          </p>
+        </div>
+      </div>
+
       {/* Main Scrollable Content */}
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4 pb-24">
         {/* 考核批次 Row with 2026Q1 / 2025Q4 Pills */}
