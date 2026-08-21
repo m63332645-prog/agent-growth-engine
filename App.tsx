@@ -2267,7 +2267,8 @@ const AttendanceModal: React.FC<{
       list = list.filter(i =>
         i.name.toLowerCase().includes(term) ||
         i.empId.toLowerCase().includes(term) ||
-        (i.supervisor && i.supervisor.toLowerCase().includes(term))
+        (i.supervisor && i.supervisor.toLowerCase().includes(term)) ||
+        (i.rank && i.rank.toLowerCase().includes(term))
       );
     }
     return [...list].sort((a, b) => a.attendanceRate - b.attendanceRate);
@@ -2314,7 +2315,7 @@ const AttendanceModal: React.FC<{
                   <i className="fa-solid fa-magnifying-glass text-slate-400 text-xs shrink-0"></i>
                   <input
                     type="text"
-                    placeholder="按姓名搜索..."
+                    placeholder="搜索姓名/工号/主管/职级..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="flex-1 w-full bg-transparent text-xs text-[#282B3E] font-medium placeholder:text-slate-400 focus:outline-none"

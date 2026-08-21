@@ -1163,10 +1163,11 @@ export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps>
       return allPersonnel.slice(0, 8);
     }
     const term = searchTerm.trim().toLowerCase();
-    return allPersonnel.filter(node => 
+    return allPersonnel.filter(node =>
       node.name.toLowerCase().includes(term) ||
       node.empId.toLowerCase().includes(term) ||
       node.rank.toLowerCase().includes(term) ||
+      (node.nodeType === 'supervisor' && '主管'.includes(term)) ||
       (node.generation !== '--' && node.generation.toLowerCase().includes(term))
     ).slice(0, 8);
   }, [allPersonnel, searchTerm]);
@@ -1240,9 +1241,10 @@ export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps>
         const term = searchTerm.trim().toLowerCase();
         const nameMatch = node.name.toLowerCase().includes(term);
         const idMatch = node.empId.toLowerCase().includes(term);
-        const rankMatch = node.rank.toLowerCase() === term;
-        const genMatch = (term === '直辖' && node.generation === '--') || (node.generation !== '--' && node.generation.toLowerCase() === term);
-        if (!(nameMatch || idMatch || rankMatch || genMatch)) return false;
+        const rankMatch = node.rank.toLowerCase().includes(term);
+        const supervisorMatch = node.nodeType === 'supervisor' && '主管'.includes(term);
+        const genMatch = (term === '直辖' && node.generation === '--') || (node.generation !== '--' && node.generation.toLowerCase().includes(term));
+        if (!(nameMatch || idMatch || rankMatch || supervisorMatch || genMatch)) return false;
       }
 
       return true;
@@ -1346,7 +1348,7 @@ export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps>
                   <Search className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    placeholder="按姓名搜索..."
+                    placeholder="搜索姓名/工号/主管/职级..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
