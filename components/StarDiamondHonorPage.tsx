@@ -11,7 +11,6 @@ import {
   Calendar, 
   Check, 
   X, 
-  Home, 
   BarChart2, 
   Users, 
   User,
@@ -22,7 +21,6 @@ import {
   History,
   Medal,
   Star,
-  TrendingUp,
   AlertCircle,
   Award,
   ArrowUpRight,
@@ -1934,25 +1932,6 @@ const StarDiamondHonorPage: React.FC<{ isOpen: boolean; onClose: () => void }> =
         )}
       </AnimatePresence>
       </main>
-
-      {/* Bottom Navigation */}
-      <nav className="shrink-0 z-10 bg-white border-t border-slate-100 px-6 py-2 flex items-center justify-between">
-        {[
-          { name: '首页', icon: Home },
-          { name: '洞察', icon: TrendingUp },
-        ].map((item) => (
-          <button
-            key={item.name}
-            onClick={() => setActiveNav(item.name)}
-            className={`flex flex-col items-center gap-1 transition-colors ${
-              activeNav === item.name ? 'text-brand-green' : 'text-slate-400'
-            }`}
-          >
-            <item.icon className="w-6 h-6" />
-            <span className="text-[10px] font-medium">{item.name}</span>
-          </button>
-        ))}
-      </nav>
 
       {/* Starting Poster Overlay */}
       <AnimatePresence>

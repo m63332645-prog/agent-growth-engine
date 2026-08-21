@@ -5528,6 +5528,7 @@ const App: React.FC = () => {
     { icon: 'fa-trophy', label: '荣誉', color: 'text-[#00A758] bg-green-50' },
     { icon: 'fa-arrow-up-right-dots', label: '晋升', color: 'text-purple-600 bg-purple-50' },
     { icon: 'fa-shield-heart', label: '留任', color: 'text-teal-600 bg-teal-50' },
+    { icon: 'fa-trophy', label: '竞赛', color: 'text-rose-600 bg-rose-50' },
     { icon: 'fa-wallet', label: '我的收入', color: 'text-[#00A758] bg-green-50' },
     { icon: '', label: '宏运特区/独立区', color: 'text-[#00A758] bg-green-50', special: true },
   ];
@@ -5563,6 +5564,10 @@ const App: React.FC = () => {
     }
     if (label === '宏运特区/独立区') {
       setView(ViewType.HONGYUN_ZONE);
+      return;
+    }
+    if (label === '竞赛') {
+      window.open('https://amasit01.manulife-sinochem.com/AI/competition/', '_blank');
       return;
     }
     handleModuleClick(label);
