@@ -5268,7 +5268,6 @@ const App: React.FC = () => {
   const [subsidyModalOpen, setSubsidyModalOpen] = useState(false);
   const [trainingModalOpen, setTrainingModalOpen] = useState(false);
   const [teamDetailModalOpen, setTeamDetailModalOpen] = useState(false);
-  const [selectedTeamMember, setSelectedTeamMember] = useState<TeamMember | null>(null);
   const [badgeWallModalOpen, setBadgeWallModalOpen] = useState(false);
   const [activityModalOpen, setActivityModalOpen] = useState(false);
   const [promotionModalOpen, setPromotionModalOpen] = useState(false);
@@ -7005,20 +7004,7 @@ const App: React.FC = () => {
         isOpen={teamDetailModalOpen}
         onClose={() => setTeamDetailModalOpen(false)}
         initialScope={teamFilter === 'direct' ? '直辖室' : teamFilter === 'district' ? '营业区' : '所辖'}
-        onSelectMember={(member) => setSelectedTeamMember(member)}
       />
-
-      {selectedTeamMember && (
-        <MemberPerformanceDetail
-          member={selectedTeamMember}
-          onBack={() => setSelectedTeamMember(null)}
-          isAmountHidden={isAmountHidden}
-          onOpenBasicLaw={() => setBasicLawModalOpen(true)}
-          onOpenPromotion={() => setGrowthModalOpen(true)}
-          onOpenHonor={() => setHonorModalOpen(true)}
-          onOpenSubsidy={() => setBasicLawModalOpen(true)}
-        />
-      )}
 
       <AnimatePresence>
         {view === ViewType.MY_INCOME && (

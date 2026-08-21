@@ -1,5 +1,4 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { TeamMember } from '@/types';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ChevronRight, 
@@ -801,10 +800,9 @@ interface TeamManagementDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialScope?: '直辖室' | '营业区' | '所辖';
-  onSelectMember?: (member: TeamMember) => void;
 }
 
-export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps> = ({ isOpen, onClose, initialScope, onSelectMember }) => {
+export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps> = ({ isOpen, onClose, initialScope }) => {
   // State
   const [scope, setScope] = useState<'直辖室' | '营业区' | '所辖'>(initialScope || '所辖');
   const [archMode, setArchMode] = useState<'育成' | '管理'>('管理');
@@ -1676,29 +1674,9 @@ export const TeamManagementDetailModal: React.FC<TeamManagementDetailModalProps>
                             {/* Name & Badge (Hidden in Compact Mode) */}
                             {!isCompact && (
                               <div className="min-w-0 flex items-center gap-1.5 truncate">
-                                {onSelectMember ? (
-                                  <button
-                                    type="button"
-                                    onClick={() => onSelectMember({
-                                      id: row.id,
-                                      name: row.name,
-                                      rank: row.rank,
-                                      ape: row.净APE,
-                                      retentionRisk: row.保费续保率12M >= 90 ? 'low' : row.保费续保率12M >= 80 ? 'medium' : 'high',
-                                      groupName: `${row.name.substring(0, 1)}组 · ${row.generation}`,
-                                      birthday: '1988-06-15',
-                                      hireDate: '2019-03-01',
-                                      hireDays: 365,
-                                    })}
-                                    className="text-[15px] font-black text-[#34384B] truncate underline decoration-[#00A758]/30 underline-offset-2 hover:text-[#00A758] transition-colors cursor-pointer"
-                                  >
-                                    {row.name}
-                                  </button>
-                                ) : (
-                                  <span className="text-[15px] font-black text-[#34384B] truncate">
-                                    {row.name}
-                                  </span>
-                                )}
+                                <span className="text-[15px] font-black text-[#34384B] truncate">
+                                  {row.name}
+                                </span>
 
                                 {row.id === 'root-chen' && (
                                   <span className="bg-[#00A758] text-white text-[10px] font-black px-1.5 py-0.2 rounded shadow-2xs shrink-0">
