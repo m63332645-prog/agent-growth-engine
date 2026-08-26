@@ -128,10 +128,10 @@ export const SupervisorIncomeCalculator: React.FC<SupervisorIncomeCalculatorProp
   }, [personalFycSafe, personalRankRate, personalCoeff, studioFycSafe, studioManagementRate]);
 
   // 较2026年奖金变化 (直属工作室每月管理奖的变化部分，仅主管个人计发部分)
-  // = 主管个人当月FYC * 主管职级对应奖金率 * 主管本人FYC奖金率系数
+  // 2026年基准系数1.0，2027年新规则系数0.7，差额 -0.3 × 主管FYC × 奖金率
   const prizeChange2026 = useMemo(() => {
-    return Math.round(personalFycSafe * personalRankRate * personalCoeff);
-  }, [personalFycSafe, personalRankRate, personalCoeff]);
+    return Math.round(-0.3 * personalFycSafe * personalRankRate);
+  }, [personalFycSafe, personalRankRate]);
 
   // 直辖工作室奖金变化合计 = 直辖工作室辅导奖测算 + 直辖工作室每月管理奖金变化
   const totalIncomeChange = useMemo(() => {
