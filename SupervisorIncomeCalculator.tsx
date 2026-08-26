@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
-import { RotateCcw, ChevronLeft } from 'lucide-react';
+import { RotateCcw, ChevronLeft, ChevronDown } from 'lucide-react';
 
 interface SupervisorIncomeCalculatorProps {
   isOpen: boolean;
@@ -11,8 +11,13 @@ type SupervisorRank =
   | 'UM' | 'SUM' | 'ADM' | 'SADM'
   | 'DM' | 'SDM' | 'DD' | 'SDD' | 'EDD';
 
-const SUPERVISOR_RANK_OPTIONS: SupervisorRank[] = [
-  'UM', 'SUM', 'ADM', 'SADM', 'DM', 'SDM', 'DD', 'SDD', 'EDD',
+// 下拉框显示选项：SADM/DM/SDM/DD/SDD/EDD 奖金率相同，合并为一项
+// label 为下拉框内完整文字，display 为选中后截断显示文字
+const RANK_DISPLAY: { value: SupervisorRank; label: string; display: string }[] = [
+  { value: 'UM', label: 'UM', display: 'UM' },
+  { value: 'SUM', label: 'SUM', display: 'SUM' },
+  { value: 'ADM', label: 'ADM', display: 'ADM' },
+  { value: 'SADM', label: 'SADM/DM/SDM/DD/SDD/EDD', display: 'SADM...' },
 ];
 
 interface StudioTier {
@@ -28,7 +33,7 @@ const STUDIO_TIERS: StudioTier[] = [
   { minFyc: 108000, label: '≥108,000', rates: { UM: 0.26, SUM: 0.28, ADM: 0.30, SADM: 0.32, DM: 0.32, SDM: 0.32, DD: 0.32, SDD: 0.32, EDD: 0.32 } },
   { minFyc: 72000, label: '≥72,000', rates: { UM: 0.24, SUM: 0.26, ADM: 0.28, SADM: 0.30, DM: 0.30, SDM: 0.30, DD: 0.30, SDD: 0.30, EDD: 0.30 } },
   { minFyc: 36000, label: '≥36,000', rates: { UM: 0.22, SUM: 0.24, ADM: 0.26, SADM: 0.28, DM: 0.28, SDM: 0.28, DD: 0.28, SDD: 0.28, EDD: 0.28 } },
-  { minFyc: 18000, label: '≥18,000', rates: { UM: 0.20, SUM: 0.20, ADM: 0.22, SADM: 0.24, DM: 0.24, SDM: 0.24, DD: 0.24, SDD: 0.24, EDD: 0.24 } },
+  { minFyc: 18000, label: '≥18,000', rates: { UM: 0.20, SUM: 0.22, ADM: 0.24, SADM: 0.26, DM: 0.26, SDM: 0.26, DD: 0.26, SDD: 0.26, EDD: 0.26 } },
   { minFyc: 9000, label: '≥9,000', rates: { UM: 0.15, SUM: 0.15, ADM: 0.15, SADM: 0.15, DM: 0.15, SDM: 0.15, DD: 0.15, SDD: 0.15, EDD: 0.15 } },
   { minFyc: 4500, label: '≥4,500', rates: { UM: 0.12, SUM: 0.12, ADM: 0.12, SADM: 0.12, DM: 0.12, SDM: 0.12, DD: 0.12, SDD: 0.12, EDD: 0.12 } },
 ];
@@ -39,7 +44,7 @@ const PERSONAL_RANK_TIERS: StudioTier[] = [
   { minFyc: 108000, label: '≥108,000', rates: { UM: 0.26, SUM: 0.28, ADM: 0.30, SADM: 0.32, DM: 0.32, SDM: 0.32, DD: 0.32, SDD: 0.32, EDD: 0.32 } },
   { minFyc: 72000, label: '≥72,000', rates: { UM: 0.24, SUM: 0.26, ADM: 0.28, SADM: 0.30, DM: 0.30, SDM: 0.30, DD: 0.30, SDD: 0.30, EDD: 0.30 } },
   { minFyc: 36000, label: '≥36,000', rates: { UM: 0.22, SUM: 0.24, ADM: 0.26, SADM: 0.28, DM: 0.28, SDM: 0.28, DD: 0.28, SDD: 0.28, EDD: 0.28 } },
-  { minFyc: 18000, label: '≥18,000', rates: { UM: 0.20, SUM: 0.20, ADM: 0.22, SADM: 0.24, DM: 0.24, SDM: 0.24, DD: 0.24, SDD: 0.24, EDD: 0.24 } },
+  { minFyc: 18000, label: '≥18,000', rates: { UM: 0.20, SUM: 0.22, ADM: 0.24, SADM: 0.26, DM: 0.26, SDM: 0.26, DD: 0.26, SDD: 0.26, EDD: 0.26 } },
   { minFyc: 9000, label: '≥9,000', rates: { UM: 0.15, SUM: 0.15, ADM: 0.15, SADM: 0.15, DM: 0.15, SDM: 0.15, DD: 0.15, SDD: 0.15, EDD: 0.15 } },
   { minFyc: 4500, label: '≥4,500', rates: { UM: 0.12, SUM: 0.12, ADM: 0.12, SADM: 0.12, DM: 0.12, SDM: 0.12, DD: 0.12, SDD: 0.12, EDD: 0.12 } },
 ];
@@ -57,6 +62,8 @@ export const SupervisorIncomeCalculator: React.FC<SupervisorIncomeCalculatorProp
   const [newAgentCount, setNewAgentCount] = useState<number>(DEFAULT_VALUES.newAgentCount);
   const [newAgentFyc, setNewAgentFyc] = useState<number>(DEFAULT_VALUES.newAgentFyc);
   const [supervisorRank, setSupervisorRank] = useState<SupervisorRank>(DEFAULT_VALUES.supervisorRank);
+  const [rankSelectOpen, setRankSelectOpen] = useState(false);
+  const rankSelectRef = useRef<HTMLDivElement>(null);
   const [personalFyc, setPersonalFyc] = useState<number | null>(DEFAULT_VALUES.personalFyc);
   const [studioFyc, setStudioFyc] = useState<number | null>(
     DEFAULT_VALUES.personalFyc + DEFAULT_VALUES.newAgentFyc * STUDIO_FYC_FLOOR_FACTOR,
@@ -205,6 +212,19 @@ export const SupervisorIncomeCalculator: React.FC<SupervisorIncomeCalculatorProp
     }
   }, [studioFycFloor]);
 
+  useEffect(() => {
+    if (!rankSelectOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (rankSelectRef.current && !rankSelectRef.current.contains(e.target as Node)) {
+        setRankSelectOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [rankSelectOpen]);
+
+  const selectedRankDisplay = RANK_DISPLAY.find(r => r.value === supervisorRank)?.display ?? supervisorRank;
+
   if (!isOpen) return null;
 
   return (
@@ -348,26 +368,44 @@ export const SupervisorIncomeCalculator: React.FC<SupervisorIncomeCalculatorProp
           {/* Section 2: 直辖工作室每月管理奖 */}
           <div className="bg-white rounded-2xl p-4 border border-slate-100 shadow-sm space-y-3">
             {/* Header: 职级下拉框在标题右边，靠近标题 */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-[#2B7FFF]"></div>
-                <span className="text-sm font-bold text-slate-900 tracking-tight">直辖工作室每月管理奖</span>
+            <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <div className="w-2 h-2 rounded-full bg-[#2B7FFF] flex-shrink-0"></div>
+                <span className="text-sm font-bold text-slate-900 tracking-tight whitespace-nowrap">直辖工作室每月管理奖</span>
               </div>
 
-              {/* Rank Select Dropdown - 在标题右边 */}
-              <div className="inline-flex items-center gap-1 border border-blue-200/70 bg-[#EDF5FF] px-2 py-0.5 rounded-md text-xs font-bold">
-                <span className="text-[#8EC2FF]">职级:</span>
-                <select
-                  value={supervisorRank}
-                  onChange={(e) => setSupervisorRank(e.target.value as SupervisorRank)}
-                  className="bg-transparent text-[#2B7FFF] font-extrabold focus:outline-none cursor-pointer"
+              {/* Custom Rank Select Dropdown - 紧贴标题右侧 */}
+              <div ref={rankSelectRef} className="relative flex-shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setRankSelectOpen(!rankSelectOpen)}
+                  className="inline-flex items-center gap-0.5 border border-blue-200/70 bg-[#EDF5FF] px-1.5 py-0.5 rounded-md text-[10px] font-bold cursor-pointer"
                 >
-                  {SUPERVISOR_RANK_OPTIONS.map((rank) => (
-                    <option key={rank} value={rank} className="text-slate-900 font-bold">
-                      {rank}
-                    </option>
-                  ))}
-                </select>
+                  <span className="text-[#8EC2FF] whitespace-nowrap">职级:</span>
+                  <span className="text-[#2B7FFF] font-extrabold truncate max-w-[72px]">{selectedRankDisplay}</span>
+                  <ChevronDown className={`w-2.5 h-2.5 text-[#2B7FFF] transition-transform ${rankSelectOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {rankSelectOpen && (
+                  <div className="absolute top-full right-0 mt-1 z-50 bg-white border border-slate-200 rounded-lg shadow-lg py-1 min-w-[160px]">
+                    {RANK_DISPLAY.map((rank) => (
+                      <button
+                        key={rank.value}
+                        type="button"
+                        onClick={() => {
+                          setSupervisorRank(rank.value);
+                          setRankSelectOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-1.5 text-[10px] font-bold hover:bg-blue-50/60 transition-colors ${
+                          rank.value === supervisorRank
+                            ? 'text-[#2B7FFF] bg-blue-50/40'
+                            : 'text-slate-700'
+                        }`}
+                      >
+                        {rank.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
