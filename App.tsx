@@ -57,6 +57,8 @@ import { RecruitmentManagementModal } from './components/RecruitmentManagementSy
 import { RetentionManagementModal } from './components/RetentionManagementPage';
 import { PromotionManagementModal } from './components/PromotionManagementPage';
 import { FinancialSubsidyModal } from './components/FinancialSubsidyPage';
+import CompetitionLandingModal from './CompetitionLandingModal';
+import { CompetitionModal, SchemeId } from './CompetitionModal_v3_保单维度版';
 
 // --- Gap Indicator Component ---
 const GapIndicator: React.FC<{ item: any; isHidden?: boolean }> = ({ item, isHidden }) => {
@@ -5369,6 +5371,12 @@ const App: React.FC = () => {
   const [hasSeenNewPaid, setHasSeenNewPaid] = useState(false);
   const [hasSeenNewUnpaid, setHasSeenNewUnpaid] = useState(false);
 
+  // 竞赛方案中心 & 竞赛详情状态
+  const [competitionLandingOpen, setCompetitionLandingOpen] = useState(false);
+  const [competitionModalOpen, setCompetitionModalOpen] = useState(false);
+  const [competitionScheme, setCompetitionScheme] = useState<SchemeId>('p1');
+  const [competitionEnded, setCompetitionEnded] = useState(false);
+
   const earnedHonors = [
     { id: 'mdrt', icon: 'fa-ribbon', color: 'text-yellow-500', bg: 'bg-yellow-50' },
     { id: 'elite', icon: 'fa-medal', color: 'text-amber-500', bg: 'bg-amber-50' },
@@ -5530,7 +5538,7 @@ const App: React.FC = () => {
     { icon: 'fa-trophy', label: '荣誉', color: 'text-[#00A758] bg-green-50' },
     { icon: 'fa-arrow-up-right-dots', label: '晋升', color: 'text-purple-600 bg-purple-50' },
     { icon: 'fa-shield-heart', label: '留任', color: 'text-teal-600 bg-teal-50' },
-    { icon: 'fa-trophy', label: '竞赛', color: 'text-rose-600 bg-rose-50' },
+    { icon: 'fa-medal', label: '竞赛', color: 'text-rose-600 bg-rose-50' },
     { icon: 'fa-wallet', label: '我的收入', color: 'text-[#00A758] bg-green-50' },
     { icon: '', label: '宏运特区/独立区', color: 'text-[#00A758] bg-green-50', special: true },
   ];
@@ -5569,7 +5577,7 @@ const App: React.FC = () => {
       return;
     }
     if (label === '竞赛') {
-      window.open('https://amasit01.manulife-sinochem.com/AI/competition/', '_blank');
+      setCompetitionLandingOpen(true);
       return;
     }
     handleModuleClick(label);
@@ -6957,6 +6965,23 @@ const App: React.FC = () => {
           <ChevronRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-slate-400 group-hover:translate-x-0.5 transition-all" />
         </motion.button>
       )}
+
+      {/* 竞赛方案中心 & 竞赛详情 */}
+      <CompetitionLandingModal
+        isOpen={competitionLandingOpen}
+        onClose={() => setCompetitionLandingOpen(false)}
+        onOpenPhase1={() => { setCompetitionScheme('p1'); setCompetitionEnded(false); setCompetitionLandingOpen(false); setCompetitionModalOpen(true); }}
+        onOpenScheme={(id, ended) => { setCompetitionScheme(id); setCompetitionEnded(!!ended); setCompetitionLandingOpen(false); setCompetitionModalOpen(true); }}
+      />
+      <CompetitionModal
+        key={`${competitionScheme}-${competitionEnded}`}
+        isOpen={competitionModalOpen}
+        onClose={() => { setCompetitionModalOpen(false); setCompetitionLandingOpen(true); }}
+        stats={stats ?? MOCK_PERSONAL_STATS}
+        isAmountHidden={isAmountHidden}
+        scheme={competitionScheme}
+        ended={competitionEnded}
+      />
 
       {/* Bottom Navigation Bar */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] px-4 min-h-16 flex flex-col z-50">
