@@ -3024,23 +3024,6 @@ const CollapsibleInsightItem: React.FC<{
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {/* 星钻恒星奖：标准一/标准二切换，与标题同一行，展开后显示 */}
-          {isStarDiamond && isExpanded && (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="flex bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/50 shadow-inner"
-            >
-              {(['标准一', '标准二'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={(e) => { e.stopPropagation(); setStarTab(tab); }}
-                  className={`px-2.5 py-0.5 rounded-md text-[10px] font-black transition-all ${starTab === tab ? 'bg-white text-[#00A758] shadow-sm' : 'text-slate-400'}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-          )}
           <div className="flex flex-col items-end gap-1.5">
             {gap > 0 && !(isStarDiamond && isExpanded) && (
               <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
@@ -3180,11 +3163,28 @@ const CollapsibleInsightItem: React.FC<{
                 )}
                 {/* 星钻恒星奖：进度条下方显示距下一档差 */}
                 {isStarDiamond && gap > 0 && (
-                  <div className="-mt-3 mb-4">
+                  <div className="-mt-3 mb-1">
                     <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1 w-fit">
                       <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
                       <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
                     </span>
+                  </div>
+                )}
+                {/* 星钻恒星奖：标准一/标准二切换，距下一档差正下方 */}
+                {isStarDiamond && isExpanded && (
+                  <div
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/50 shadow-inner w-fit mb-2"
+                  >
+                    {(['标准一', '标准二'] as const).map((tab) => (
+                      <button
+                        key={tab}
+                        onClick={(e) => { e.stopPropagation(); setStarTab(tab); }}
+                        className={`px-2.5 py-0.5 rounded-md text-[10px] font-black transition-all ${starTab === tab ? 'bg-white text-[#00A758] shadow-sm' : 'text-slate-400'}`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
                   </div>
                 )}
                 {/* 星钻恒星奖：进度条下方显示历史追踪 */}
