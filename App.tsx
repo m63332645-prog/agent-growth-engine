@@ -3012,7 +3012,7 @@ const CollapsibleInsightItem: React.FC<{
       {/* Header - Always visible, handles toggle */}
       <div 
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex justify-between items-center cursor-pointer group"
+        className="flex justify-between items-start cursor-pointer group"
       >
         <div className="flex items-center gap-2">
           <div className={`w-1 h-3 rounded-full transition-colors ${insight.impactType === 'warning' ? 'bg-amber-400' : 'bg-[#00D76F]'}`}></div>
