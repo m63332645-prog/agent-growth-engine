@@ -3091,21 +3091,11 @@ const CollapsibleInsightItem: React.FC<{
                         下一档：{insight.targetVal.toLocaleString()}
                       </p>
                     )}
-                    {/* 星钻恒星奖：右侧 badge + 下一档（竖直排列） */}
-                    {isStarDiamond && (
-                      <div className="flex flex-col items-end gap-2">
-                        {gap > 0 && (
-                          <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
-                            <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
-                            <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
-                          </span>
-                        )}
-                        {insight.targetVal > insight.currentVal && (
-                          <p className="text-[11px] font-bold text-amber-600">
-                            下一档：{insight.targetVal.toLocaleString()}
-                          </p>
-                        )}
-                      </div>
+                    {/* 星钻恒星奖：右侧下一档（与月度业绩奖一致） */}
+                    {isStarDiamond && insight.targetVal > insight.currentVal && (
+                      <p className="text-[11px] font-bold text-amber-600">
+                        下一档：{insight.targetVal.toLocaleString()}
+                      </p>
                     )}
                   </div>
                 )}
@@ -3187,6 +3177,15 @@ const CollapsibleInsightItem: React.FC<{
                 {/* 月度业绩奖：进度条下方显示奖金率 */}
                 {insight.name === '月度业绩奖' && insight.currentRate && (
                   <p className="text-[11px] text-[#00A758] font-bold -mt-3 mb-1">奖金率：{insight.currentRate}</p>
+                )}
+                {/* 星钻恒星奖：进度条下方显示距下一档差 */}
+                {isStarDiamond && gap > 0 && (
+                  <div className="-mt-3 mb-1">
+                    <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1 w-fit">
+                      <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
+                      <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
+                    </span>
+                  </div>
                 )}
                 {/* 星钻恒星奖：进度条下方显示历史追踪 */}
                 {isStarDiamond && insight.history && (
