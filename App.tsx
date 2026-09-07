@@ -3180,7 +3180,7 @@ const CollapsibleInsightItem: React.FC<{
                 )}
                 {/* 星钻恒星奖：进度条下方显示距下一档差 */}
                 {isStarDiamond && gap > 0 && (
-                  <div className="-mt-3 mb-1">
+                  <div className="-mt-3 mb-4">
                     <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1 w-fit">
                       <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
                       <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
