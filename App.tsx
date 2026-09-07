@@ -3023,7 +3023,7 @@ const CollapsibleInsightItem: React.FC<{
             </h4>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-1.5">
+        <div className="flex flex-col items-end gap-3">
           {gap > 0 && (
             <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
               <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
