@@ -3044,7 +3044,7 @@ const CollapsibleInsightItem: React.FC<{
           <div className="flex flex-col items-end gap-1.5">
             {gap > 0 && !(isStarDiamond && isExpanded) && (
               <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
-                <span className="text-[7px] font-bold opacity-60 uppercase">距下一档差</span>
+                <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
                 <span className="leading-none tracking-tighter">FYC {isAmountHidden ? '****' : gap.toLocaleString()}</span>
               </span>
             )}
@@ -3062,7 +3062,7 @@ const CollapsibleInsightItem: React.FC<{
             transition={{ duration: 0.3 }}
             className="overflow-hidden"
           >
-            <div className="pt-3 space-y-2.5">
+            <div className={`space-y-2.5 ${isStarDiamond ? 'pt-4' : 'pt-3'}`}>
               <div className="px-0.5">
                 <div className="flex justify-between items-end mb-1">
                   <div className="flex flex-col gap-0.5">
@@ -3072,37 +3072,45 @@ const CollapsibleInsightItem: React.FC<{
                         <i className="fa-solid fa-flag text-[9px]"></i> {insight.progress}
                       </p>
                     )}
-                    {insight.currentRate && (
-                      <span className="text-[8px] text-blue-400 font-bold bg-blue-50 self-start px-1 rounded">当前奖金率: {insight.currentRate}</span>
-                    )}
-                    {insight.currentTier && !isStarDiamond && (
+                    {insight.currentTier && !isStarDiamond && insight.name !== '月度业绩奖' && (
                       <span className="text-[8px] text-blue-400 font-bold bg-blue-50 self-start px-1 rounded">
                         {insight.isQuarterEnd ? `季度最低档位: ${insight.currentTier}` : `当前达成: ${insight.currentTier}`}
                       </span>
                     )}
                   </div>
-                    {!isAmountHidden && !isStarDiamond && (
-                      <span className="text-[10px] text-slate-400 font-bold">
-                        当前达成: FYC {insight.currentVal.toLocaleString()}
-                      </span>
-                    )}
                 </div>
-                {/* 星钻恒星奖：当前达成 + 距下一档差，同一行，紧贴下方月份卡片 */}
-                {isStarDiamond && !isAmountHidden && (
-                  <div className="flex justify-between items-center mt-2 mb-0.5">
-                    <p className="text-[10px] text-slate-400 font-bold">
-                      当前达成: FYC {insight.currentVal.toLocaleString()}
+                {/* 月度业绩奖 / 星钻恒星奖：签发可计佣FYC + 档位信息 */}
+                {(insight.name === '月度业绩奖' || isStarDiamond) && !isAmountHidden && (
+                  <div className="flex justify-between items-start mt-1 mb-0.5">
+                    <p className="text-[11px] text-[#00A758] font-black">
+                      签发可计佣FYC：{insight.currentVal.toLocaleString()}
                     </p>
-                    {gap > 0 && (
-                      <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
-                        <span className="text-[7px] font-bold opacity-60 uppercase">距下一档差</span>
-                        <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
-                      </span>
+                    {/* 月度业绩奖：右侧下一档 */}
+                    {insight.name === '月度业绩奖' && insight.targetVal > insight.currentVal && (
+                      <p className="text-[10px] font-bold text-amber-600">
+                        下一档：{insight.targetVal.toLocaleString()}
+                      </p>
+                    )}
+                    {/* 星钻恒星奖：右侧 badge + 下一档（竖直排列） */}
+                    {isStarDiamond && (
+                      <div className="flex flex-col items-end gap-2">
+                        {gap > 0 && (
+                          <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
+                            <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
+                            <span className="leading-none tracking-tighter">FYC {gap.toLocaleString()}</span>
+                          </span>
+                        )}
+                        {insight.targetVal > insight.currentVal && (
+                          <p className="text-[11px] font-bold text-amber-600">
+                            下一档：{insight.targetVal.toLocaleString()}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
-                {/* 星钻历史追踪 */}
-                {insight.history && (
+                {/* 星钻恒星奖：历史追踪 */}
+                {insight.history && !isStarDiamond && (
                   <div className="flex gap-2 mt-0.5 mb-2 overflow-x-auto pb-1">
                     {insight.history.map((h: any, i: number) => (
                       <div key={i} className={`flex-1 min-w-[60px] p-1.5 rounded-lg border flex flex-col items-center gap-0.5 ${h.status === 'current' ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100'}`}>
@@ -3154,23 +3162,12 @@ const CollapsibleInsightItem: React.FC<{
                     )}
                   </div>
 
-                  {/* Floating Marker for Current Value */}
-                  <div 
-                    className="absolute h-full transition-all duration-1000 ease-out pointer-events-none"
-                    style={{ left: `${Math.min(100, (insight.currentVal / (insight.targetVal * 1.15)) * 100)}%` }}
-                  >
-                     <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap text-[7px] font-black text-slate-400">{isAmountHidden ? '****' : insight.currentVal.toLocaleString()}</div>
-                  </div>
-
                   {/* Target Indicator with Yellow Glow if tracked goal */}
                   <div 
                     className="absolute h-full transition-all duration-1000 ease-out"
                     style={{ left: `${(insight.targetVal / (insight.targetVal * 1.15)) * 100}%` }}
                   >
                      <div className={`absolute -top-1 bottom-1 w-[2px] ${(insight.name === '月度业绩奖' || insight.name === '星钻恒星奖') ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]' : 'bg-slate-300'}`}></div>
-                     <div className={`absolute top-full mt-1.5 left-1/2 -translate-x-1/2 whitespace-nowrap text-[7px] font-black px-1 rounded ${(insight.name === '月度业绩奖' || insight.name === '星钻恒星奖') ? 'text-amber-600 bg-amber-50 border border-amber-200' : 'text-slate-400 bg-slate-50 border border-slate-100'}`}>
-                       目标 {isAmountHidden ? '****' : insight.targetVal.toLocaleString()}
-                     </div>
                   </div>
 
                   {/* Notch Indicators for Tiers */}
@@ -3187,9 +3184,35 @@ const CollapsibleInsightItem: React.FC<{
                     })}
                   </div>
                 </div>
-                {/* 星钻恒星奖、月度业绩奖：进度条下方口径提示 */}
-                {(isStarDiamond || insight.name === '月度业绩奖') && (
-                  <p className="text-[9px] text-slate-400 font-bold mt-1">FYC：签发可计佣口径,仅作追踪使用</p>
+                {/* 月度业绩奖：进度条下方显示奖金率 */}
+                {insight.name === '月度业绩奖' && insight.currentRate && (
+                  <p className="text-[11px] text-[#00A758] font-bold -mt-3 mb-1">奖金率：{insight.currentRate}</p>
+                )}
+                {/* 星钻恒星奖：进度条下方显示历史追踪 */}
+                {isStarDiamond && insight.history && (
+                  <div className="flex gap-2 mt-1 mb-2 overflow-x-auto pb-1">
+                    {insight.history.map((h: any, i: number) => (
+                      <div key={i} className={`flex-1 min-w-[60px] p-1.5 rounded-lg border flex flex-col items-center gap-0.5 ${h.status === 'current' ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100'}`}>
+                        <span className={`text-[8px] font-bold ${h.status === 'current' ? 'text-[#00A758]' : 'text-slate-400'}`}>{h.period}</span>
+                        <span className={`text-[9px] font-black ${h.status === 'achieved' || h.status === 'current' ? 'text-green-600' : 'text-blue-600'}`}>{h.tier}</span>
+                        {h.consecutive !== undefined && (
+                          <span className="text-[7px] text-slate-400">连续月：{h.consecutive}</span>
+                        )}
+                        {h.count !== undefined && starTab === '标准一' && (() => {
+                          const [done, total] = String(h.count).split('/').map((n: string) => parseInt(n, 10));
+                          const met = !isNaN(done) && !isNaN(total) && done >= total;
+                          return (
+                            <span className={`text-[7px] ${met ? 'text-green-600' : 'text-red-500'}`}>
+                              件数：<span className="font-black">{done}</span>/{total}
+                            </span>
+                          );
+                        })()}
+                        {h.fyc !== undefined && h.count === undefined && (
+                          <span className="text-[7px] text-slate-400">FYC {h.fyc.toLocaleString()}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
