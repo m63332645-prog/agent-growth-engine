@@ -3010,9 +3010,9 @@ const CollapsibleInsightItem: React.FC<{
       className={`bg-white rounded-xl border transition-all duration-300 overflow-hidden ${isExpanded ? 'p-3 border-slate-100 shadow-sm' : 'p-2.5 border-slate-50 shadow-xs hover:border-slate-200'}`}
     >
       {/* Header - Always visible, handles toggle */}
-      <div 
+      <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex justify-between items-start cursor-pointer group"
+        className={`flex justify-between items-start cursor-pointer group ${isStarDiamond && isExpanded ? 'border-b border-slate-100 pb-2.5' : ''}`}
       >
         <div className="flex items-center gap-2">
           <div className={`w-1 h-3 rounded-full transition-colors ${insight.impactType === 'warning' ? 'bg-amber-400' : 'bg-[#00D76F]'}`}></div>
@@ -3023,29 +3023,12 @@ const CollapsibleInsightItem: React.FC<{
             </h4>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-3">
-          {gap > 0 && (
+        <div className="flex flex-col items-end">
+          {gap > 0 && !(isStarDiamond && isExpanded) && (
             <span className="text-[10px] font-black text-amber-600 bg-amber-50 border-amber-100 px-1.5 py-0.5 rounded border flex items-center gap-1">
               <span className="text-[10px] font-bold opacity-60 uppercase">距下一档差</span>
-              <span className="leading-none tracking-tighter">FYC {isAmountHidden ? '****' : gap.toLocaleString()}</span>
+              <span className="leading-none tracking-tighter">FYC：{isAmountHidden ? '****' : gap.toLocaleString()}</span>
             </span>
-          )}
-          {/* 星钻恒星奖：标准一/标准二切换，距下一档差正下方，展开后显示 */}
-          {isStarDiamond && isExpanded && (
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className="flex bg-slate-100/80 p-0.5 rounded-lg border border-slate-200/50 shadow-inner"
-            >
-              {(['标准一', '标准二'] as const).map((tab) => (
-                <button
-                  key={tab}
-                  onClick={(e) => { e.stopPropagation(); setStarTab(tab); }}
-                  className={`px-2.5 py-0.5 rounded-md text-[10px] font-black transition-all ${starTab === tab ? 'bg-white text-[#00A758] shadow-sm' : 'text-slate-400'}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
           )}
         </div>
       </div>
@@ -3061,6 +3044,23 @@ const CollapsibleInsightItem: React.FC<{
             className="overflow-hidden"
           >
             <div className={`space-y-2.5 ${isStarDiamond ? 'pt-4' : 'pt-3'}`}>
+              {/* 星钻恒星奖：标准一/标准二全宽切换，位于标题分隔线下方 */}
+              {isStarDiamond && (
+                <div
+                  onClick={(e) => e.stopPropagation()}
+                  className="flex bg-slate-100/80 p-1 rounded-xl border border-slate-200/50"
+                >
+                  {(['标准一', '标准二'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={(e) => { e.stopPropagation(); setStarTab(tab); }}
+                      className={`flex-1 py-1.5 rounded-lg text-[13px] font-bold transition-all ${starTab === tab ? 'bg-white text-[#00A758] shadow-sm' : 'text-slate-400'}`}
+                    >
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="px-0.5">
                 <div className="flex justify-between items-end mb-1">
                   <div className="flex flex-col gap-0.5">
@@ -3077,24 +3077,40 @@ const CollapsibleInsightItem: React.FC<{
                     )}
                   </div>
                 </div>
-                {/* 月度业绩奖 / 星钻恒星奖：签发可计佣FYC + 档位信息 */}
-                {(insight.name === '月度业绩奖' || isStarDiamond) && !isAmountHidden && (
+                {/* 月度业绩奖：签发可计佣FYC + 下一档（同一行） */}
+                {insight.name === '月度业绩奖' && !isAmountHidden && (
                   <div className="flex justify-between items-start mt-1 mb-0.5">
                     <p className="text-[11px] text-[#00A758] font-black">
                       签发可计佣FYC：{insight.currentVal.toLocaleString()}
                     </p>
-                    {/* 月度业绩奖：右侧下一档 */}
-                    {insight.name === '月度业绩奖' && insight.targetVal > insight.currentVal && (
-                      <p className="text-[10px] font-bold text-amber-600">
-                        下一档：{insight.targetVal.toLocaleString()}
-                      </p>
-                    )}
-                    {/* 星钻恒星奖：右侧下一档（与月度业绩奖一致） */}
-                    {isStarDiamond && insight.targetVal > insight.currentVal && (
+                    {insight.targetVal > insight.currentVal && (
                       <p className="text-[11px] font-bold text-amber-600">
-                        下一档：{insight.targetVal.toLocaleString()}
+                        下一档FYC：{insight.targetVal.toLocaleString()}
                       </p>
                     )}
+                  </div>
+                )}
+                {/* 星钻恒星奖：两行排版 — 标签行 + 数值行（6,000与下一档FYC同一行） */}
+                {isStarDiamond && (
+                  <div className="flex flex-col mt-1 mb-0.5">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[11px] text-[#00A758] font-bold">签发可计佣FYC</span>
+                      {gap > 0 && (
+                        <p className="text-[11px] font-bold text-amber-500">
+                          距下一档差 FYC：<span className="text-[11px] font-black text-amber-600">{isAmountHidden ? '****' : gap.toLocaleString()}</span>
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex justify-between items-center mt-0.5">
+                      <span className="text-[11px] leading-tight text-[#00A758] font-black">
+                        {isAmountHidden ? '****' : insight.currentVal.toLocaleString()}
+                      </span>
+                      {insight.targetVal > insight.currentVal && (
+                        <p className="text-[11px] font-bold text-amber-500">
+                          下一档FYC：<span className="text-[11px] font-black text-amber-600">{isAmountHidden ? '****' : insight.targetVal.toLocaleString()}</span>
+                        </p>
+                      )}
+                    </div>
                   </div>
                 )}
                 {/* 星钻恒星奖：历史追踪 */}
