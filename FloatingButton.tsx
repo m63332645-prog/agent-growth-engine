@@ -16,44 +16,49 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
   const dragOffset = useRef({ x: 0, y: 0 });
   const startPosition = useRef({ x: 0, y: 0 });
   const isPressedRef = useRef(false);
-  const buttonSize = 56;
-  const collapsedHeight = 84;
-  const edgeThreshold = 60;
-  const clickThreshold = 5;
-  const bottomNavHeight = 64;
+  const BUTTON_W = 92;
+  const BUTTON_H = 36;
+  const COLLAPSED_W = 20;
+  const COLLAPSED_H = 64;
+  const EDGE_THRESHOLD = 60;
+  const CLICK_THRESHOLD = 5;
+  const BOTTOM_NAV_H = 64;
 
   useEffect(() => {
     setPosition({
-      x: window.innerWidth - buttonSize - 20,
-      y: window.innerHeight - buttonSize - bottomNavHeight - 20,
+      x: window.innerWidth - BUTTON_W - 16,
+      y: window.innerHeight - BUTTON_H - BOTTOM_NAV_H - 16,
     });
   }, []);
 
   useEffect(() => {
     const handleResize = () => {
       if (!isDragging) {
-        const newX = Math.max(0, Math.min(window.innerWidth - buttonSize - 20, position.x));
-        const newY = Math.max(60, Math.min(window.innerHeight - buttonSize - bottomNavHeight - 20, position.y));
-        setPosition({ x: newX, y: newY });
+        setPosition({
+          x: Math.max(0, Math.min(window.innerWidth - BUTTON_W - 16, position.x)),
+          y: Math.max(60, Math.min(window.innerHeight - BUTTON_H - BOTTOM_NAV_H - 16, position.y)),
+        });
       }
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [position.x, position.y, isDragging]);
 
+  const getButtonW = (collapsed: boolean) => collapsed ? COLLAPSED_W : BUTTON_W;
+  const getButtonH = (collapsed: boolean) => collapsed ? COLLAPSED_H : BUTTON_H;
+
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
     isPressedRef.current = true;
-    const currentX = isCollapsed 
-      ? (position.x < 0 ? 0 : window.innerWidth - buttonSize)
+    const w = getButtonW(isCollapsed);
+    const h = getButtonH(isCollapsed);
+    const currentX = isCollapsed
+      ? (position.x < 0 ? 0 : window.innerWidth - w)
       : position.x;
-    const currentY = isCollapsed 
-      ? window.innerHeight - collapsedHeight - bottomNavHeight - 20 
+    const currentY = isCollapsed
+      ? window.innerHeight - h - BOTTOM_NAV_H - 16
       : position.y;
-    dragOffset.current = {
-      x: e.clientX - currentX,
-      y: e.clientY - currentY,
-    };
+    dragOffset.current = { x: e.clientX - currentX, y: e.clientY - currentY };
     startPosition.current = { x: e.clientX, y: e.clientY };
     e.stopPropagation();
   }, [position.x, position.y, isCollapsed]);
@@ -61,16 +66,15 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
   const handleTouchStart = useCallback((e: TouchEvent) => {
     const touch = e.touches[0];
     isPressedRef.current = true;
-    const currentX = isCollapsed 
-      ? (position.x < 0 ? 0 : window.innerWidth - buttonSize)
+    const w = getButtonW(isCollapsed);
+    const h = getButtonH(isCollapsed);
+    const currentX = isCollapsed
+      ? (position.x < 0 ? 0 : window.innerWidth - w)
       : position.x;
-    const currentY = isCollapsed 
-      ? window.innerHeight - collapsedHeight - bottomNavHeight - 20 
+    const currentY = isCollapsed
+      ? window.innerHeight - h - BOTTOM_NAV_H - 16
       : position.y;
-    dragOffset.current = {
-      x: touch.clientX - currentX,
-      y: touch.clientY - currentY,
-    };
+    dragOffset.current = { x: touch.clientX - currentX, y: touch.clientY - currentY };
     startPosition.current = { x: touch.clientX, y: touch.clientY };
     e.stopPropagation();
   }, [position.x, position.y, isCollapsed]);
@@ -78,28 +82,29 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!isPressedRef.current) return;
     const distance = Math.sqrt(
-      Math.pow(e.clientX - startPosition.current.x, 2) + 
+      Math.pow(e.clientX - startPosition.current.x, 2) +
       Math.pow(e.clientY - startPosition.current.y, 2)
     );
-    if (distance >= clickThreshold && !isDraggingRef.current) {
+    if (distance >= CLICK_THRESHOLD && !isDraggingRef.current) {
       isDraggingRef.current = true;
       setIsDragging(true);
-      const startX = isCollapsed 
-        ? (position.x < 0 ? 0 : window.innerWidth - buttonSize)
+      const w = getButtonW(isCollapsed);
+      const h = getButtonH(isCollapsed);
+      const startX = isCollapsed
+        ? (position.x < 0 ? 0 : window.innerWidth - w)
         : position.x;
-      const startY = isCollapsed 
-        ? window.innerHeight - collapsedHeight - bottomNavHeight - 20 
+      const startY = isCollapsed
+        ? window.innerHeight - h - BOTTOM_NAV_H - 16
         : position.y;
-      setDragPosition({
-        x: startX,
-        y: startY,
-      });
+      setDragPosition({ x: startX, y: startY });
     }
     if (isDraggingRef.current) {
-      const currentHeight = isCollapsed ? collapsedHeight : buttonSize;
-      const newX = Math.max(0, Math.min(window.innerWidth - buttonSize, e.clientX - dragOffset.current.x));
-      const newY = Math.max(60, Math.min(window.innerHeight - currentHeight - bottomNavHeight, e.clientY - dragOffset.current.y));
-      setDragPosition({ x: newX, y: newY });
+      const w = getButtonW(isCollapsed);
+      const h = getButtonH(isCollapsed);
+      setDragPosition({
+        x: Math.max(0, Math.min(window.innerWidth - w, e.clientX - dragOffset.current.x)),
+        y: Math.max(60, Math.min(window.innerHeight - h - BOTTOM_NAV_H, e.clientY - dragOffset.current.y)),
+      });
     }
   }, [position.x, position.y, isCollapsed]);
 
@@ -108,28 +113,29 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
     e.preventDefault();
     const touch = e.touches[0];
     const distance = Math.sqrt(
-      Math.pow(touch.clientX - startPosition.current.x, 2) + 
+      Math.pow(touch.clientX - startPosition.current.x, 2) +
       Math.pow(touch.clientY - startPosition.current.y, 2)
     );
-    if (distance >= clickThreshold && !isDraggingRef.current) {
+    if (distance >= CLICK_THRESHOLD && !isDraggingRef.current) {
       isDraggingRef.current = true;
       setIsDragging(true);
-      const startX = isCollapsed 
-        ? (position.x < 0 ? 0 : window.innerWidth - buttonSize)
+      const w = getButtonW(isCollapsed);
+      const h = getButtonH(isCollapsed);
+      const startX = isCollapsed
+        ? (position.x < 0 ? 0 : window.innerWidth - w)
         : position.x;
-      const startY = isCollapsed 
-        ? window.innerHeight - collapsedHeight - bottomNavHeight - 20 
+      const startY = isCollapsed
+        ? window.innerHeight - h - BOTTOM_NAV_H - 16
         : position.y;
-      setDragPosition({
-        x: startX,
-        y: startY,
-      });
+      setDragPosition({ x: startX, y: startY });
     }
     if (isDraggingRef.current) {
-      const currentHeight = isCollapsed ? collapsedHeight : buttonSize;
-      const newX = Math.max(0, Math.min(window.innerWidth - buttonSize, touch.clientX - dragOffset.current.x));
-      const newY = Math.max(60, Math.min(window.innerHeight - currentHeight - bottomNavHeight, touch.clientY - dragOffset.current.y));
-      setDragPosition({ x: newX, y: newY });
+      const w = getButtonW(isCollapsed);
+      const h = getButtonH(isCollapsed);
+      setDragPosition({
+        x: Math.max(0, Math.min(window.innerWidth - w, touch.clientX - dragOffset.current.x)),
+        y: Math.max(60, Math.min(window.innerHeight - h - BOTTOM_NAV_H, touch.clientY - dragOffset.current.y)),
+      });
     }
   }, [position.x, position.y, isCollapsed]);
 
@@ -139,19 +145,23 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
     if (isDraggingRef.current) {
       isDraggingRef.current = false;
       setIsDragging(false);
-      const finalPosition = dragPosition;
-      const isGoingToCollapse = finalPosition.x < edgeThreshold || finalPosition.x > window.innerWidth - edgeThreshold - buttonSize;
-      const currentHeight = isGoingToCollapse ? collapsedHeight : buttonSize;
-      const boundedY = Math.max(60, Math.min(window.innerHeight - currentHeight - bottomNavHeight, finalPosition.y));
-      if (finalPosition.x < edgeThreshold) {
+      const fp = dragPosition;
+      const fw = BUTTON_W;
+      const fh = BUTTON_H;
+      if (fp.x < EDGE_THRESHOLD) {
         setIsCollapsed(true);
+        const bh = COLLAPSED_H;
+        const boundedY = Math.max(60, Math.min(window.innerHeight - bh - BOTTOM_NAV_H, fp.y));
         setPosition({ x: -10, y: boundedY });
-      } else if (finalPosition.x > window.innerWidth - edgeThreshold - buttonSize) {
+      } else if (fp.x > window.innerWidth - EDGE_THRESHOLD - fw) {
         setIsCollapsed(true);
+        const bh = COLLAPSED_H;
+        const boundedY = Math.max(60, Math.min(window.innerHeight - bh - BOTTOM_NAV_H, fp.y));
         setPosition({ x: window.innerWidth - 10, y: boundedY });
       } else {
         setIsCollapsed(false);
-        setPosition({ x: finalPosition.x, y: boundedY });
+        const boundedY = Math.max(60, Math.min(window.innerHeight - fh - BOTTOM_NAV_H, fp.y));
+        setPosition({ x: fp.x, y: boundedY });
       }
     }
   }, [dragPosition]);
@@ -171,7 +181,6 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
     document.addEventListener('mouseup', handleMouseUp);
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
     document.addEventListener('touchend', handleTouchEnd);
-
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
@@ -184,10 +193,10 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
     if (isDragging) return;
     if (isCollapsed) {
       setIsCollapsed(false);
-      const newX = position.x < window.innerWidth / 2 
-        ? buttonSize + 20 
-        : window.innerWidth - buttonSize - 20;
-      setPosition({ x: newX, y: position.y });
+      setPosition({
+        x: position.x < window.innerWidth / 2 ? BUTTON_W + 16 : window.innerWidth - BUTTON_W - 16,
+        y: position.y,
+      });
     } else {
       setIsMenuOpen(true);
     }
@@ -255,7 +264,7 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
                 ))}
               </div>
             </div>
-            
+
             <div className="flex justify-center pb-4 pt-2 border-t border-slate-100">
               <motion.button
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -283,32 +292,32 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
           touchAction: 'none',
         }}
         initial={{ scale: 0 }}
-        animate={{ 
-          width: isCollapsed ? 20 : buttonSize,
-          height: isCollapsed ? collapsedHeight : buttonSize,
-          scale: isDragging ? 1 : 1,
-          borderRadius: isCollapsed ? 32 : buttonSize / 2,
-          x: isCollapsed ? (currentPosition.x < window.innerWidth / 2 ? buttonSize / 2 - 10 : -(buttonSize / 2 - 10)) : 0,
+        animate={{
+          width: isCollapsed ? COLLAPSED_W : BUTTON_W,
+          height: isCollapsed ? COLLAPSED_H : BUTTON_H,
+          borderRadius: isCollapsed ? 32 : BUTTON_H / 2,
+          scale: 1,
           opacity: isMenuOpen ? 0 : 1,
+          x: isCollapsed ? (currentPosition.x < window.innerWidth / 2 ? BUTTON_W / 2 - 10 : -(BUTTON_W / 2 - 10)) : 0,
         }}
-        transition={{ 
-          type: 'spring', 
-          damping: 20, 
+        transition={{
+          type: 'spring',
+          damping: 20,
           stiffness: 300,
           duration: 0.3,
         }}
         onMouseDown={handleMouseDown}
         onClick={handleClick}
         onTouchStart={handleTouchStart}
-        whileHover={!isCollapsed ? { scale: 1.1 } : {}}
+        whileHover={!isCollapsed ? { scale: 1.05 } : {}}
         whileTap={{ scale: 0.95 }}
       >
         <motion.div
-          className="bg-[#00A758] shadow-xl flex items-center justify-center"
-          animate={{ 
-            width: isCollapsed ? 20 : buttonSize,
-            height: isCollapsed ? collapsedHeight : buttonSize,
-            borderRadius: isCollapsed ? 32 : buttonSize / 2,
+          className="bg-[#00A758] shadow-lg flex items-center justify-center"
+          animate={{
+            width: isCollapsed ? COLLAPSED_W : BUTTON_W,
+            height: isCollapsed ? COLLAPSED_H : BUTTON_H,
+            borderRadius: isCollapsed ? 32 : BUTTON_H / 2,
           }}
         >
           {isCollapsed ? (
@@ -317,16 +326,19 @@ const FloatingButton: React.FC<FloatingButtonProps> = ({ navItems, onNavClick })
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className={`fa-solid fa-chevron-${position.x < window.innerWidth / 2 ? 'right' : 'left'} text-white text-base font-bold`}
+              className={`fa-solid fa-chevron-${position.x < window.innerWidth / 2 ? 'right' : 'left'} text-white text-xs font-bold`}
             />
           ) : (
-            <motion.i
-              key="plus"
+            <motion.div
+              key="pill-content"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fa-solid fa-plus text-white text-2xl font-bold"
-            />
+              className="flex items-center justify-center gap-1.5 px-3"
+            >
+              <i className="fa-solid fa-bars text-white text-[11px]"></i>
+              <span className="text-white text-[12px] font-semibold tracking-wide">更多</span>
+            </motion.div>
           )}
         </motion.div>
       </motion.div>
